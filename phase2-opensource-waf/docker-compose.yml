@@ -1,0 +1,58 @@
+# Phase 2 — ModSecurity WAF + DVWA
+# Architecture : Client → WAF (ModSecurity) → DVWA
+
+services:
+  dvwa:
+    image: ghcr.io/digininja/dvwa:latest
+    container_name: dvwa
+    environment:
+      - DB_SERVER=dvwa-db
+    depends_on:
+      - dvwa-db
+    networks:
+      - internal
+    # DVWA inaccessible directement → passe obligatoirement par le WAF
+
+  dvwa-db:
+    image: mariadb:10.6
+    container_name: dvwa-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=dvwa
+      - MYSQL_DATABASE=dvwa
+      - MYSQL_USER=dvwa
+      - MYSQL_PASSWORD=p@ssw0rd
+    volumes:
+      - dvwa-db-data:/var/lib/mysql
+    networks:
+      - internal
+
+  waf:
+    image: owasp/modsecurity-crs:apache
+    container_name: modsecurity-waf
+    restart: always
+    ports:
+      - "80:8080"
+    environment:
+      - BACKEND=http://dvwa:80
+      - PARANOIA=1
+      - ANOMALY_INBOUND=5
+      - ANOMALY_OUTBOUND=4
+      - BLOCKING_PARANOIA=1
+    volumes:
+      - ./logs:/var/log/apache2
+      - ./modsecurity/RESPONSE-999-EXCLUSIONS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSIONS.conf
+    networks:
+      - internal
+      - external
+    depends_on:
+      - dvwa
+
+networks:
+  internal:
+    driver: bridge
+    internal: true    # DVWA invisible depuis l'extérieur
+  external:
+    driver: bridge
+
+volumes:
+  dvwa-db-data:

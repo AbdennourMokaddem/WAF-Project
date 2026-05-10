@@ -1,0 +1,35 @@
+# Phase 1 — DVWA exposé directement (SANS WAF)
+# Utilisé uniquement pour prouver les vulnérabilités
+
+services:
+  dvwa:
+    image: ghcr.io/digininja/dvwa:latest
+    container_name: dvwa-vulnerable
+    environment:
+      - DB_SERVER=dvwa-db
+    depends_on:
+      - dvwa-db
+    ports:
+      - "8080:80"
+    networks:
+      - dvwa-net
+
+  dvwa-db:
+    image: mariadb:10.6
+    container_name: dvwa-db-vulnerable
+    environment:
+      - MYSQL_ROOT_PASSWORD=dvwa
+      - MYSQL_DATABASE=dvwa
+      - MYSQL_USER=dvwa
+      - MYSQL_PASSWORD=p@ssw0rd
+    volumes:
+      - dvwa-db-data:/var/lib/mysql
+    networks:
+      - dvwa-net
+
+networks:
+  dvwa-net:
+    driver: bridge
+
+volumes:
+  dvwa-db-data:

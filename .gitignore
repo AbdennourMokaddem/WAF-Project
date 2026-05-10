@@ -1,0 +1,28 @@
+# Logs
+*.log
+phase2-opensource-waf/logs/*
+phase3-custom-waf/logs/*
+!phase2-opensource-waf/logs/.gitkeep
+!phase3-custom-waf/logs/.gitkeep
+
+# Rapports ZAP (trop lourds)
+phase2-opensource-waf/reports/*.html
+phase2-opensource-waf/reports/*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*.env
+venv/
+.venv/
+
+# Docker
+.docker/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sessions ZAP
+*.session
+*.session.lck
