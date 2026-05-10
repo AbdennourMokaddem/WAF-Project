@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  custom_waf:
+    build: .
+    container_name: custom_waf_phase3
+    restart: unless-stopped
+    environment:
+      - TARGET_URL=http://host.docker.internal:8080
+      - WAF_PORT=8080
+      - WAF_MODE=block
+      - LOG_FILE=/app/logs/waf_alerts.json
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8888:8080"

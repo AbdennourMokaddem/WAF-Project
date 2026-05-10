@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 - Accès Refusé | WAF Protection</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(220, 38, 38, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 60%);
+      animation: pulse-bg 4s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes pulse-bg {
+      from { opacity: 0.6; }
+      to   { opacity: 1.0; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 3rem;
+      max-width: 680px;
+      width: 90%;
+    }
+
+    /* Shield icon */
+    .shield-wrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(220, 38, 38, 0.15);
+      border: 2px solid rgba(220, 38, 38, 0.4);
+      margin-bottom: 2rem;
+      animation: shield-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes shield-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.4); }
+      50%       { box-shadow: 0 0 0 20px rgba(220,38,38,0); }
+    }
+
+    .shield-icon {
+      font-size: 3rem;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25%       { transform: rotate(-8deg); }
+      75%       { transform: rotate(8deg); }
+    }
+
+    .error-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 5rem;
+      font-weight: 700;
+      color: #dc2626;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 40px rgba(220, 38, 38, 0.5);
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #f0f0f0;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      color: #9ca3af;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    /* Info card */
+    .info-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.875rem;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+
+    .info-label {
+      color: #6b7280;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    .info-value {
+      color: #e0e0e0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      text-align: right;
+    }
+
+    .rule-id {
+      color: #f87171;
+      font-weight: 700;
+    }
+
+    /* Back button */
+    .back-btn {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+    }
+
+    /* Scanlines effect */
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .waf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(220, 38, 38, 0.1);
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      border-radius: 20px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.75rem;
+      color: #f87171;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="container">
+    <div class="shield-wrapper">
+      <span class="shield-icon">🛡️</span>
+    </div>
+
+    <div class="waf-badge">⚡ Custom WAF Active</div>
+
+    <div class="error-code">403</div>
+    <div class="title">Requête Bloquée</div>
+    <p class="subtitle">
+      Notre WAF a détecté un contenu potentiellement malveillant dans votre requête.
+      Cette tentative a été journalisée et l'administrateur a été alerté.
+    </p>
+
+    <div class="info-card">
+      <div class="info-row">
+        <span class="info-label">RULE_ID</span>
+        <span class="info-value rule-id">{{RULE_ID}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">SEVERITY</span>
+        <span class="info-value">{{SEVERITY}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">TIMESTAMP</span>
+        <span class="info-value">{{TIMESTAMP}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">REFERENCE</span>
+        <span class="info-value">{{INCIDENT_ID}}</span>
+      </div>
+    </div>
+
+    <button class="back-btn" onclick="history.back()">← Retour</button>
+  </div>
+</body>
+</html>

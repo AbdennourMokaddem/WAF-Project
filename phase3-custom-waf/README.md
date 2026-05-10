@@ -1,76 +1,57 @@
-# Phase 3 — Custom WAF (Python)
+# Phase 3 — Advanced Custom WAF (Python)
 
-**Responsable : [Prénom Ami]**
+Ce module implémente un Web Application Firewall (WAF) personnalisé ultra-performant écrit en Python asynchrone (`aiohttp`).
 
-## Architecture
+## 🛡️ Fonctionnalités Avancées
 
-```
-Client (Browser / ZAP)
-        ↓
-Custom WAF Python (port 8888)   ← Reverse Proxy + Inspection
-        ↓
-DVWA (port 8080)                ← App cible
-```
+| Fonctionnalité | Description | Statut |
+|----------------|-------------|--------|
+| **Async Proxy** | Moteur de reverse proxy haute performance basé sur `aiohttp`. | ✅ |
+| **Normalisation** | Pipeline anti-évasion (décodage URL récursif, suppression commentaires SQL, collapse whitespace). | ✅ |
+| **Inspection Multi-Zone** | Analyse URI, Headers, Cookies, et Body (JSON & Form-data). | ✅ |
+| **Moteur de Règles** | Système modulaire de signatures (Regex) classées par sévérité. | ✅ |
+| **Rate Limiting** | Protection anti-brute-force avec sliding window et bannissement temporaire. | ✅ |
+| **Logging JSON** | Journalisation structurée compatible avec les outils SIEM (ELK, Splunk). | ✅ |
+| **Page 403 Premium** | Interface utilisateur moderne pour les requêtes bloquées. | ✅ |
 
-## Fonctionnalités
+## 📁 Structure du Module
 
-| Fonctionnalité | Implémentée |
-|----------------|-------------|
-| Reverse Proxy HTTP | ✅ |
-| Inspection URI | ✅ |
-| Inspection Headers | ✅ |
-| Inspection Body (POST) | ✅ |
-| Détection SQLi (Regex) | ✅ |
-| Détection XSS (Regex) | ✅ |
-| Réponse 403 + page HTML custom | ✅ |
-| Logging JSON structuré | ✅ |
-
-## Démarrage
-
-```bash
-# Installer les dépendances (aucune lib externe requise)
-python3 --version   # Python 3.10+ requis
-
-# Lancer DVWA d'abord (Phase 1)
-cd ../phase1-target
-docker compose up -d
-cd ../phase3-custom-waf
-
-# Lancer le WAF
-python3 waf.py
-
-# Accéder à DVWA via le Custom WAF
-# http://localhost:8888
+```text
+phase3-custom-waf/
+├── docker-compose.yml  # Déploiement conteneurisé
+├── Dockerfile          # Image du WAF
+├── requirements.txt    # Dépendances Python
+├── main.py             # Point d'entrée & Moteur Proxy
+├── inspector.py        # Logique d'inspection
+├── normalizer.py       # Pipeline anti-obfuscation
+├── config.py           # Configuration (Ports, Target, Mode)
+├── logger.py           # Journalisation asynchrone
+├── rate_limiter.py     # Protection anti-flood
+├── rules/              # Signatures de détection (SQLi, XSS, LFI)
+├── logs/               # Fichiers de logs JSON
+├── block_page.html     # Page d'erreur 403 personnalisée
+└── waf.py              # (Ancien script - Obsolète)
 ```
 
-## Format des logs
+## 🚀 Démarrage
 
-Chaque attaque bloquée est loggée en JSON dans `logs/waf_blocked.log` :
+### 🐳 Docker (Recommandé)
 
-```json
-{
-  "timestamp": "2026-05-02T14:30:00Z",
-  "attacker_ip": "127.0.0.1",
-  "triggered_rule": "SQLi",
-  "malicious_payload": "1 OR 1=1",
-  "uri": "/vulnerabilities/sqli/?id=1+OR+1%3D1"
-}
-```
+1. Assurez-vous que l'application cible (Phase 1) est lancée sur le port `8080`.
+2. Lancez le WAF :
+   ```bash
+   docker compose up -d
+   ```
+3. Accédez à l'application protégée via le WAF :
+   ```
+   http://localhost:8888
+   ```
 
-## Règles de détection
+## 📊 Analyse des Menaces
 
-Les règles sont définies dans `waf.py` sous `SQLI_PATTERNS` et `XSS_PATTERNS`.
-
-### SQLi détectée
-- `UNION SELECT`
-- `OR 1=1`
-- `DROP TABLE`
-- `SLEEP()` / `BENCHMARK()`
-- etc.
-
-### XSS détectée
-- `<script>`
-- `javascript:`
-- `onerror=` / `onload=`
-- `alert()`
-- etc.
+Les alertes sont stockées dans `logs/waf_alerts.json` au format JSON. Chaque entrée contient :
+- L'IP de l'attaquant
+- Le payload malveillant détecté
+- La zone touchée (URI, Body, Header, etc.)
+- La sévérité (CRITICAL, HIGH, etc.)
+- L'ID de la règle déclenchée

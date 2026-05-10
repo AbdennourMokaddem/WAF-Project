@@ -15,26 +15,37 @@ Ce projet explore le fonctionnement interne des Web Application Firewalls (WAF) 
 
 ## 👥 Membres du groupe
 
-ABDENNOUR MOKADDEM 
-BILAL BAHIJ
+- **Abdennour Mokaddem**
+- **Bilal Bahij**
 
 ---
 
 ## 📁 Structure du repo
 
-```
+```text
 WAF-Project/
 ├── phase1-target/              → App vulnérable (DVWA)
 ├── phase2-opensource-waf/      → ModSecurity + OWASP CRS
 │   ├── docker-compose.yml
-│   ├── modsecurity/            → Configs ModSecurity
-│   ├── scripts/                → Scripts de test
-│   └── reports/                → Rapports ZAP
-├── phase3-custom-waf/          → Custom WAF Python
-│   ├── waf.py
-│   ├── rules/                  → Règles de détection
-│   └── logs/                   → Logs des attaques bloquées
+│   └── modsecurity/            → Configs ModSecurity
+├── phase3-custom-waf/          → Advanced Custom WAF (Python/Aiohttp)
+│   ├── docker-compose.yml      → Déploiement conteneurisé du WAF
+│   ├── Dockerfile              # Image du WAF
+│   ├── main.py                 → Async Proxy Engine
+│   ├── config.py               → Configuration (Ports, Target, Mode)
+│   ├── inspector.py            → Rule Engine
+│   ├── normalizer.py           → Anti-Evasion Pipeline
+│   ├── rate_limiter.py         → Protection anti-flood
+│   ├── logger.py               → Journalisation asynchrone JSON
+│   ├── requirements.txt        → Dépendances Python (aiohttp, etc.)
+│   ├── rules/                  → Signatures de détection (SQLi, XSS, LFI)
+│   ├── logs/                   → Fichiers de logs générés
+│   ├── block_page.html         → Interface 403 personnalisée
+│   └── waf.py                  → (Ancien script - Obsolète)
 └── phase4-testing/             → Scripts de test comparatifs
+    └── scripts/
+        ├── run_all_tests.sh    → Lanceur de tests global
+        └── waf_comparison.py   → Générateur de tableau comparatif (Python)
 ```
 
 ---
@@ -54,9 +65,16 @@ cd WAF-Project/phase2-opensource-waf
 docker compose up -d
 ```
 
-Accéder à DVWA via le WAF :
+Accéder à DVWA via le WAF Open-Source (Port 80) :
 ```
 http://localhost
+```
+
+Accéder à DVWA via le Custom WAF (Port 8888) :
+```bash
+cd ../phase3-custom-waf
+docker compose up -d
+# Accès : http://localhost:8888
 ```
 
 ---
@@ -65,12 +83,12 @@ http://localhost
 
 | Métrique | Sans WAF | WAF Open-Source | Custom WAF |
 |----------|----------|----------------|------------|
-| Requêtes bloquées | 0 | 1394 (23.6%) | - |
-| SQLi bloquées | 0% | 100% | - |
-| XSS bloquées | 0% | 100% | - |
-| Alertes ZAP High | 0 | 0 | - |
-| Alertes ZAP Medium | 3 | 3 | - |
-| Faux positifs critiques | - | 0 | - |
+| Requêtes bloquées | 0 | 1394 (23.6%) | 100% (10/10 tests) |
+| SQLi bloquées | 0% | 100% | 100% |
+| XSS bloquées | 0% | 100% | 100% |
+| LFI bloquées | 0% | - | 100% |
+| CMDi bloquées | 0% | - | 100% |
+| Faux positifs critiques | - | 0 | 0 |
 
 ---
 

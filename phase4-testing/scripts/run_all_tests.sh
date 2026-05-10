@@ -87,13 +87,13 @@ else
 fi
 
 # ================================================
-# RÉSUMÉ FINAL
+# RÉSUMÉ FINAL — Nouveau moteur de comparaison
 # ================================================
 echo ""
 echo "=========================================="
-echo "  RÉSUMÉ DES FICHIERS GÉNÉRÉS"
+echo "  GÉNÉRATION DU RAPPORT COMPARATIF"
 echo "=========================================="
-ls -la "$REPORTS_DIR/"
+python3 waf_comparison.py
+
 echo ""
 echo "✅ Phase 4 terminée !"
-echo "   Ouvrir les rapports : firefox $REPORTS_DIR/*.html"
