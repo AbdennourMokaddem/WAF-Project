@@ -1,7 +1,6 @@
 # WAF Project — Under the Hood
 
 > **ENSAM Casablanca — Cybersécurité**  
-> Pr. Mouaad Mohy-eddine | Deadline : 10 Mai 2026
 
 ## 🎯 Objectif
 
@@ -16,10 +15,8 @@ Ce projet explore le fonctionnement interne des Web Application Firewalls (WAF) 
 
 ## 👥 Membres du groupe
 
-| Membre | Partie |
-|--------|--------|
-| Abdennour | Phase 2 — WAF Open-Source (ModSecurity) |
-| [Prénom Ami] | Phase 3 — Custom WAF (Python) |
+ABDENNOUR MOKADDEM 
+BILAL BAHIJ
 
 ---
 
